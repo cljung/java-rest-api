@@ -6,13 +6,16 @@ CONTAINERVERSION=$2
 
 echo "Deploying : ResourceGroup=$AZRGNAME, ACR=$AZACRNAME, AKS=$AZAKSNAME, Location=$AZLOCATION"
 
+az acr login --name $ACRNAME
+az aks get-credentials --resource-group $AZRGNAME --name $AZAKSNAME
+
+# get the server name of the ACR
+ACRLOGINSERVER=$(az acr show --resource-group $AZRGNAME --name $AZACRNAME --query "loginServer" --output tsv)
+
 # tag the container for ACR and push it
 docker tag $CONTAINERNAME:$CONTAINERVERSION $ACRLOGINSERVER/$CONTAINERNAME:$CONTAINERVERSION
 docker tag $CONTAINERNAME:$CONTAINERVERSION $ACRLOGINSERVER/$CONTAINERNAME:latest
 docker push $AZACRLOGINSERVER/$CONTAINERNAME:latest
-
-# get the server name of the ACR
-ACRLOGINSERVER=$(az acr show --resource-group $AZRGNAME --name $AZACRNAME --query "loginServer" --output tsv)
 
 # modify the deployment yaml
 sed -i -e "s/xxx-CONTAINERNAME-xxx/$CONTAINERNAME/g" ./build/deploy-aks-generic.yaml
