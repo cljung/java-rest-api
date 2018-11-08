@@ -6,3 +6,5 @@ You can find references on how to use Spring Boot together with Azure AD here ht
 
 There exists an Angular.js sample in the github repo that uses a REST API backend which is basis for this REST API.
 
+## Blog post
+http://www.redbaronofazure.com/?p=7607
