@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: xxx-CONTAINERNAME-xxx
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: xxx-CONTAINERNAME-xxx
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: xxx-CONTAINERNAME-xxx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: xxx-CONTAINERNAME-xxx
+  template:
+    metadata:
+      labels:
+        app: xxx-CONTAINERNAME-xxx
+    spec:
+      containers:
+      - name: xxx-CONTAINERNAME-xxx
+        image: xxx-replace-me-ACRLOGINSERVER-xxx/xxx-CONTAINERNAME-xxx:latest
+        ports:
+        - containerPort: 8080
+
