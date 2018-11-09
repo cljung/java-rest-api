@@ -22,21 +22,11 @@ docker push $ACRLOGINSERVER/$CONTAINERNAME:latest
 cp ./deploy-aks-generic.yaml ./deploy-aks.yaml
 sed -i -e "s/xxx-CONTAINERNAME-xxx/$CONTAINERNAME/g" ./deploy-aks.yaml
 sed -i -e "s/xxx-replace-me-ACRLOGINSERVER-xxx/$ACRLOGINSERVER/g" ./deploy-aks.yaml
+sed -i -e "s/xxx-replace-me-DNSZONE-xxx/$DNSZONE/g" ./deploy-aks.yaml
 
 # deploy
 kubectl apply -f ./deploy-aks.yaml
 
 rm ./deploy-aks.yaml
-
-# get the http dns name for the AKS cluster and modify the ingest yaml file
-cp ./ingress-aks-generic.yaml ./ingress-aks.yaml
-DNSZONE=$(az aks show --resource-group $AZRGNAME --name $AZAKSNAME --query "addonProfiles.httpapplicationrouting.config.httpapplicationroutingzonename" -o table | tail -n1)
-sed -i -e "s/xxx-CONTAINERNAME-xxx/$CONTAINERNAME/g" ./ingress-aks.yaml
-sed -i -e "s/xxx-replace-me-DNSZONE-xxx/$DNSZONE/g" ./ingress-aks.yaml
-
-# deploy
-kubectl apply -f ./ingress-aks.yaml
-
-rm ./ingress-aks.yaml
 
 # az aks browse --resource-group $AZRGNAME --name $AZAKSNAME

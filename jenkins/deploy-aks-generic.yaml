@@ -5,9 +5,11 @@ metadata:
 spec:
   ports:
   - port: 8080
+    protocol: TCP
     targetPort: 8080
   selector:
     app: xxx-CONTAINERNAME-xxx
+  type: ClusterIP
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -28,4 +30,19 @@ spec:
         image: xxx-replace-me-ACRLOGINSERVER-xxx/xxx-CONTAINERNAME-xxx:latest
         ports:
         - containerPort: 8080
-
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: xxx-CONTAINERNAME-xxx-ingress
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+  - host: xxx-CONTAINERNAME-xxx.xxx-replace-me-DNSZONE-xxx
+    http:
+      paths:
+      - backend:
+          serviceName: xxx-CONTAINERNAME-xxx
+          servicePort: 8080
+        path: /
