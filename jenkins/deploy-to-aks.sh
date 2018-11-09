@@ -19,14 +19,14 @@ docker tag $CONTAINERNAME:$CONTAINERVERSION $ACRLOGINSERVER/$CONTAINERNAME:lates
 docker push $ACRLOGINSERVER/$CONTAINERNAME:latest
 
 # modify the deployment yaml
-cp ./deploy-aks-generic.yaml ./deploy-aks.yaml
-sed -i -e "s/xxx-CONTAINERNAME-xxx/$CONTAINERNAME/g" ./deploy-aks.yaml
-sed -i -e "s/xxx-replace-me-ACRLOGINSERVER-xxx/$ACRLOGINSERVER/g" ./deploy-aks.yaml
-sed -i -e "s/xxx-replace-me-DNSZONE-xxx/$DNSZONE/g" ./deploy-aks.yaml
+cp ./jenkins/deploy-aks-generic.yaml ./jenkins/deploy-aks.yaml
+sed -i -e "s/xxx-CONTAINERNAME-xxx/$CONTAINERNAME/g" ./jenkins/deploy-aks.yaml
+sed -i -e "s/xxx-replace-me-ACRLOGINSERVER-xxx/$ACRLOGINSERVER/g" ./jenkins/deploy-aks.yaml
+sed -i -e "s/xxx-replace-me-DNSZONE-xxx/$DNSZONE/g" ./jenkins/deploy-aks.yaml
 
 # deploy
-kubectl apply -f ./deploy-aks.yaml
+kubectl apply -f ./jenkins/deploy-aks.yaml
 
-rm ./deploy-aks.yaml
+rm ./jenkins/deploy-aks.yaml
 
 # az aks browse --resource-group $AZRGNAME --name $AZAKSNAME
