@@ -24,8 +24,6 @@ pipeline {
                 withCredentials([azureServicePrincipal('AzureServicePrincipalID')]) {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                     sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
-                    sh 'az acr login --name $ACRNAME'
-                    sh 'az aks get-credentials --resource-group $AZRGNAME --name $AZAKSNAME'
                     sh './jenkins/deploy-to-aks.sh java-rest-api v1.0'
                 }
             }
