@@ -4,6 +4,9 @@ CONTAINERNAME=$1
 CONTAINERVERSION=$2
 # The env vars in this script should be set by the Jenkinsfile
 
+pwd
+ls -la
+
 echo "Deploying : ResourceGroup=$AZRGNAME, ACR=$AZACRNAME, AKS=$AZAKSNAME, Location=$AZLOCATION"
 
 # login to ACR/AKS
