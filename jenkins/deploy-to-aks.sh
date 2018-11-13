@@ -18,6 +18,10 @@ docker tag $CONTAINERNAME:$CONTAINERVERSION $ACRLOGINSERVER/$CONTAINERNAME:$CONT
 docker tag $CONTAINERNAME:$CONTAINERVERSION $ACRLOGINSERVER/$CONTAINERNAME:latest
 docker push $ACRLOGINSERVER/$CONTAINERNAME:latest
 
+#DNSZONE=$(az aks show --resource-group $AZRGNAME --name $AZAKSNAME --query addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName -o table | tail -n1)
+# when we set our own custome http application proxy name, AKS creates a new attribute all in lower case
+DNSZONE=$(az aks show --resource-group $AZRGNAME --name $AZAKSNAME --query "addonProfiles.httpapplicationrouting.config.httpapplicationroutingzonename" -o tsv)
+
 # modify the deployment yaml
 cp ./jenkins/deploy-aks-generic.yaml ./jenkins/deploy-aks.yaml
 sed -i -e "s/xxx-CONTAINERNAME-xxx/$CONTAINERNAME/g" ./jenkins/deploy-aks.yaml
