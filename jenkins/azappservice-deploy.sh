@@ -5,7 +5,8 @@
 echo "Deploying : ResourceGroup=$AZRGNAME, AppName=$AZAPPNAME, AppPlan=$AZAPPPLAN, Location=$AZLOCATION"
 
 # create the RG if it doesn't exists
-if [ $(az group exists -n $AZRGNAME) == 'false' ]; then
+VAR0=$(az group show -n $AZRGNAME --query id -o tsv)
+if [ -z "$VAR0" ]; then
     az group create -n $AZRGNAME -l "$AZLOCATION"
 fi
 
@@ -37,9 +38,10 @@ len=$((len+7))
 FTPDIR=$(echo $FTPURL | cut -c $len-99 | sed 's/"//')
 
 # ftp the JAR and web.config
-echo "ftp deploy WAR --> $FTPSERVER $AZAPPNAME $FTPDIR/webapps"
+echo "ftp deploy JAR/WAR --> $FTPSERVER $AZAPPNAME $FTPDIR/webapps"
 
 cp ./target/*.war ./target/java-rest-api.war
+cp ./target/*.jar ./target/java-rest-api.jar
 
 # upload files via ftp to Azure AppServices
 ftp -p -n $FTPSERVER << EOF
@@ -49,7 +51,11 @@ cd $FTPDIR/webapps
 lcd ./target
 binary
 del java-rest-api.war
+del java-rest-api.jar
+del web.config
 put java-rest-api.war
+put java-rest-api.jar
+put web.config
 quit
 
 EOF
