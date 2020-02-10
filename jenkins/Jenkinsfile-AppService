@@ -1,0 +1,31 @@
+pipeline {
+    agent any 
+    environment {
+        AZRGNAME = "${params.AZRGNAME}"
+        AZLOCATION = "${params.AZLOCATION}"
+        AZACRNAME = "${params.AZACRNAME}"
+        AZAKSNAME = "${params.AZAKSNAME}"
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mvn -B -DskipTests clean package'
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                withCredentials([azureServicePrincipal('AzureServicePrincipalID')]) {
+                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+                    sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
+                    sh './jenkins/azappservice-deploy.sh'
+                }
+            }
+        }
+    }
+}
