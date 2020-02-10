@@ -26,8 +26,8 @@ if [ -z "$VAR0" ]; then
 #                     --java-version 1.8 --java-container "Tomcat" --java-container-version "8.0"
     az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
                      --java-version "1.8" --java-container "Java" --java-container-version "SE"
-    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=..AppID guid..."    
-    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPKEY=..App key..."                     
+    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=$AZAPPID"    
+    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPKEY=$AZAPPKEY"                     
     az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPGROUPS=basilgroup,sybilgroup"                     
 fi
 
