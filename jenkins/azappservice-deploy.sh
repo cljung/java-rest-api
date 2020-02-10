@@ -43,7 +43,8 @@ len=$((len+7))
 FTPDIR=$(echo $FTPURL | cut -c $len-99 | sed 's/"//')
 
 # ftp the JAR and web.config
-echo "ftp deploy JAR/WAR --> $FTPSERVER $AZAPPNAME $FTPDIR/webapps"
+# echo "ftp deploy WAR --> $FTPSERVER $AZAPPNAME $FTPDIR/webapps"
+echo "ftp deploy JAR --> $FTPSERVER $AZAPPNAME $FTPDIR"
 
 #cp ./target/*.war ./target/java-rest-api.war
 cp ./target/*.jar ./target/java-rest-api.jar
@@ -53,6 +54,7 @@ ftp -p -n $FTPSERVER << EOF
 
 user "$FTPUID" "$FTPPWD"
 cd $FTPDIR/webapps
+cd $FTPDIR
 del web.config
 put web.config
 lcd ./target
