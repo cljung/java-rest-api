@@ -22,8 +22,13 @@ VAR0=$(az webapp show --name "$AZAPPNAME" --resource-group "$AZRGNAME" --query "
 if [ -z "$VAR0" ]; then
     echo "create AppService=$AZAPPNAME"
     az webapp create --name "$AZAPPNAME" --resource-group "$AZRGNAME" --plan "$AZAPPPLAN"
+#    az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
+#                     --java-version 1.8 --java-container Tomcat --java-container-version 8.0
     az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
-                     --java-version 1.8 --java-container Tomcat --java-container-version 8.0
+                     --java-version 1.8 --java-container Java
+    az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=..AppID guid..."                     
+    az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPKEY=..App key..."                     
+    az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPGROUPS=basilgroup,sybilgroup"                     
 fi
 
 # get ftp server, userid/password to use for deploy
@@ -40,7 +45,7 @@ FTPDIR=$(echo $FTPURL | cut -c $len-99 | sed 's/"//')
 # ftp the JAR and web.config
 echo "ftp deploy JAR/WAR --> $FTPSERVER $AZAPPNAME $FTPDIR/webapps"
 
-cp ./target/*.war ./target/java-rest-api.war
+#cp ./target/*.war ./target/java-rest-api.war
 cp ./target/*.jar ./target/java-rest-api.jar
 
 # upload files via ftp to Azure AppServices
@@ -52,9 +57,7 @@ del web.config
 put web.config
 lcd ./target
 binary
-del java-rest-api.war
 del java-rest-api.jar
-put java-rest-api.war
 put java-rest-api.jar
 quit
 
