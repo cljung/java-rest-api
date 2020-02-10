@@ -48,14 +48,14 @@ ftp -p -n $FTPSERVER << EOF
 
 user "$FTPUID" "$FTPPWD"
 cd $FTPDIR/webapps
+del web.config
+put web.config
 lcd ./target
 binary
 del java-rest-api.war
 del java-rest-api.jar
-del web.config
 put java-rest-api.war
 put java-rest-api.jar
-put web.config
 quit
 
 EOF
