@@ -26,11 +26,25 @@ if [ -z "$VAR0" ]; then
 #                     --java-version 1.8 --java-container "Tomcat" --java-container-version "8.0"
     az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
                      --java-version "1.8" --java-container "Java" --java-container-version "SE"
-    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=$AZAPPID"    
-    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPKEY=$AZAPPKEY"                     
-    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPGROUPS=basilgroup,sybilgroup"                     
+    az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=$AZAPPID AZAPPKEY=$AZAPPKEY AZAPPGROUPS=basilgroup,sybilgroup"    
+    #az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=$AZAPPID"    
+    #az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPKEY=$AZAPPKEY"                     
+    #az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPGROUPS=basilgroup,sybilgroup"                     
 fi
 
+mkdir tmp
+cp web.config ./tmp
+cp ./target/*.jar ./tmp/java-rest-api.jar
+pushd tmp
+zip ./java-rest-api.zip web.config java-rest-api.jar
+popd
+
+az webapp deployment source config-zip -g $AZRGNAME -n $AZAPPNAME --src ./tmp/java-rest-api.zip
+
+rm -fdR ./tmp
+
+exit 0
+: '
 # get ftp server, userid/password to use for deploy
 FTPURL=$(az webapp deployment list-publishing-profiles -g $AZRGNAME -n $AZAPPNAME --query "[1].publishUrl" -o tsv)
 FTPUID=$(az webapp deployment list-publishing-profiles -g $AZRGNAME -n $AZAPPNAME --query "[1].userName" -o tsv)
@@ -64,6 +78,7 @@ put java-rest-api.jar
 quit
 
 EOF
+'
 
 # az webapp delete --name $AZAPPNAME --resource-group $AZRGNAME 
 # az appservice plan delete --name "$AZAPPPLAN" --resource-group "$AZRGNAME" 
