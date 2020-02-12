@@ -22,26 +22,30 @@ VAR0=$(az webapp show --name "$AZAPPNAME" --resource-group "$AZRGNAME" --query "
 if [ -z "$VAR0" ]; then
     echo "create AppService=$AZAPPNAME"
     az webapp create --name "$AZAPPNAME" --resource-group "$AZRGNAME" --plan "$AZAPPPLAN"
-#    az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
-#                     --java-version 1.8 --java-container "Tomcat" --java-container-version "8.0"
-    az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
+    if grep --quiet "<packaging>jar</packaging>" ./pom.xml; then 
+        az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
                      --java-version "1.8" --java-container "Java" --java-container-version "SE"
+    else # packaging war assumed
+        az webapp config set --resource-group $AZRGNAME --name $AZAPPNAME \
+                     --java-version "1.8" --java-container "Tomcat" --java-container-version "8.0"
+    fi
     az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=$AZAPPID AZAPPKEY=$AZAPPKEY AZAPPGROUPS=basilgroup,sybilgroup"    
-    #az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPID=$AZAPPID"    
-    #az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPKEY=$AZAPPKEY"                     
-    #az webapp config appsettings set --resource-group $AZRGNAME --name $AZAPPNAME --settings "AZAPPGROUPS=basilgroup,sybilgroup"                     
 fi
 
-mkdir tmp
-cp web.config ./tmp
-cp ./target/*.jar ./tmp/java-rest-api.jar
-pushd tmp
-zip ./java-rest-api.zip web.config java-rest-api.jar
-popd
+mkdir webapps
+cp ./target/*.jar ./webapps/java-rest-api.jar
+if grep --quiet "<packaging>jar</packaging>" ./pom.xml; then 
+    cp web.config ./webapps
+    pushd webapps
+    zip ./java-rest-api.zip web.config java-rest-api.jar
+    popd
+else # packaging war assumed
+    zip ./webapps/java-rest-api.zip java-rest-api.jar
+fi
 
-az webapp deployment source config-zip -g $AZRGNAME -n $AZAPPNAME --src ./tmp/java-rest-api.zip
+az webapp deployment source config-zip -g $AZRGNAME -n $AZAPPNAME --src ./webapps/java-rest-api.zip
 
-rm -fdR ./tmp
+rm -fdR ./webapps
 
 exit 0
 : '
